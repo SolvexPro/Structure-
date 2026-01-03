@@ -1,0 +1,16 @@
+use anchor_lang::prelude::*;
+
+#[error_code]
+pub enum SolvexError {
+    #[msg("Unauthorized action")]
+    Unauthorized,
+
+    #[msg("Protocol is paused")]
+    ProtocolPaused,
+
+    #[msg("Invalid module")]
+    InvalidModule,
+
+    #[msg("Module is disabled")]
+    ModuleDisabled,
+}
