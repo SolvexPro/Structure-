@@ -1,0 +1,22 @@
+use anchor_lang::prelude::*;
+use crate::state::protocol::ProtocolState;
+use crate::errors::SolvexError;
+
+#[derive(Accounts)]
+pub struct Pause<'info> {
+    #[account(mut, has_one = authority)]
+    pub protocol: Account<'info, ProtocolState>,
+    pub authority: Signer<'info>,
+}
+
+pub fn handler(ctx: Context<Pause>, value: bool) -> Result<()> {
+    let protocol = &mut ctx.accounts.protocol;
+
+    require!(
+        ctx.accounts.authority.key() == protocol.authority,
+        SolvexError::Unauthorized
+    );
+
+    protocol.paused = value;
+    Ok(())
+}
