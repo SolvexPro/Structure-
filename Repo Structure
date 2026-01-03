@@ -1,0 +1,41 @@
+solvex-protocol/
+├── README.md
+├── docs/
+│ ├── overview.md
+│ ├── architecture.md
+│ ├── design-principles.md
+│ ├── roadmap.md
+│ └── risks-and-assumptions.md
+│
+├── contracts/
+│ ├── interfaces/
+│ ├── core/
+│ ├── modules/
+│ └── mocks/
+│
+├── scripts/
+│ ├── deploy/
+│ └── admin/
+│
+├── test/
+│ ├── unit/
+│ └── integration/
+│
+├── audits/
+│ └── README.md
+│
+├── governance/
+│ ├── tokenomics.md
+│ ├── governance-model.md
+│ └── proposals/
+│
+├── frontend/
+│ ├── app/
+│ └── components/
+│
+├── config/
+│ └── networks.md
+│
+├── .gitignore
+├── LICENSE
+└── CONTRIBUTING.md
