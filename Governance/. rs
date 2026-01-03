@@ -1,0 +1,43 @@
+use anchor_lang::prelude::*;
+use crate::state::{protocol::ProtocolState, module::ModuleAccount};
+use crate::errors::SolvexError;
+
+#[derive(Accounts)]
+pub struct RegisterModule<'info> {
+    #[account(mut, has_one = authority)]
+    pub protocol: Account<'info, ProtocolState>,
+
+    #[account(
+        init,
+        payer = authority,
+        seeds = [b"module", module_id.as_ref()],
+        bump,
+        space = 8 + 32 + 32 + 1 + 1
+    )]
+    pub module: Account<'info, ModuleAccount>,
+
+    pub authority: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+pub fn handler(
+    ctx: Context<RegisterModule>,
+    module_id: [u8; 32],
+) -> Result<()> {
+    let protocol = &mut ctx.accounts.protocol;
+    let module = &mut ctx.accounts.module;
+
+    require!(
+        ctx.accounts.authority.key() == protocol.authority,
+        SolvexError::Unauthorized
+    );
+
+    module.module_id = module_id;
+    module.program_id = *ctx.program_id;
+    module.enabled = true;
+    module.bump = *ctx.bumps.get("module").unwrap();
+
+    protocol.module_count += 1;
+
+    Ok(())
+}
