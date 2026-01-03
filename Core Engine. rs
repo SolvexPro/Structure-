@@ -1,0 +1,40 @@
+use anchor_lang::prelude::*;
+use crate::state::{protocol::ProtocolState, module::ModuleAccount};
+use crate::errors::SolvexError;
+use crate::events::ExecutionEvent;
+
+#[derive(Accounts)]
+pub struct Execute<'info> {
+    #[account(seeds = [b"protocol"], bump = protocol.bump)]
+    pub protocol: Account<'info, ProtocolState>,
+
+    #[account(
+        seeds = [b"module", module.module_id.as_ref()],
+        bump = module.bump,
+        constraint = module.enabled @ SolvexError::ModuleDisabled
+    )]
+    pub module: Account<'info, ModuleAccount>,
+
+    pub caller: Signer<'info>,
+}
+
+pub fn handler(
+    ctx: Context<Execute>,
+    module_id: [u8; 32],
+    payload: Vec<u8>,
+) -> Result<()> {
+    let protocol = &ctx.accounts.protocol;
+
+    require!(!protocol.paused, SolvexError::ProtocolPaused);
+    require!(ctx.accounts.module.module_id == module_id, SolvexError::InvalidModule);
+
+    emit!(ExecutionEvent {
+        caller: ctx.accounts.caller.key(),
+        module_id,
+        payload_size: payload.len() as u64,
+    });
+
+    // Future CPI execution to module program goes here
+
+    Ok(())
+}
